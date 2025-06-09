@@ -4,154 +4,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AfarStone · 每日幸运签</title>
+  <title>AfarStone · Daily Fortune</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC&family=Lora&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom right, #f7f3ff, #e0ecff);
-      font-family: 'Arial Rounded MT Bold', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-      color: #333;
-      text-align: center;
+      background: linear-gradient(to bottom right, #f9f7ff, #e3f0ff);
+      font-family: 'Noto Serif SC', serif;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
       padding: 20px;
-    }
-    .container {
-      background: #ffffffee;
-      padding: 30px;
-      border-radius: 24px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    .brand {
-      font-size: 20px;
-      color: #a88cd5;
-      margin-bottom: 10px;
-    }
-    .title {
-      font-size: 26px;
-      margin-bottom: 20px;
       color: #444;
     }
-    .sign {
-      font-size: 22px;
-      margin: 30px 0;
-      color: #5e4b8b;
-      opacity: 0;
-      transform: scale(0.95);
-      transition: all 0.4s ease;
-      min-height: 80px;
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      padding: 30px;
+      text-align: center;
+      max-width: 90%;
+      width: 400px;
+      transition: all 0.5s ease;
     }
-    .sign.show {
-      opacity: 1;
-      transform: scale(1);
+    h1 {
+      font-size: 24px;
+      color: #8c6ac4;
+      margin-bottom: 10px;
     }
-    .info {
-      font-size: 14px;
-      color: #888;
-      margin-top: 10px;
+    .fortune {
+      font-size: 20px;
+      margin: 20px 0 10px;
+      min-height: 60px;
     }
-    .footer {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 20px;
+    .fortune.en {
+      font-family: 'Lora', serif;
+      font-size: 16px;
+      color: #666;
     }
-    .btn {
-      background-color: #a88cd5;
+    button {
+      margin-top: 15px;
+      background: #8c6ac4;
       color: white;
       border: none;
       padding: 12px 24px;
-      border-radius: 30px;
-      cursor: pointer;
+      border-radius: 25px;
       font-size: 16px;
-      box-shadow: 0 4px 12px rgba(168, 140, 213, 0.3);
-      transition: background-color 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(140, 106, 196, 0.3);
     }
-    .btn:hover {
-      background-color: #8b70c9;
+    button:hover {
+      background: #7a58b4;
+    }
+    .history-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 14px;
+      color: #8c6ac4;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .history {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 400px;
+      margin-top: 20px;
+      font-size: 14px;
+      text-align: left;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="brand">AfarStone · 每日幸运签</div>
-    <div class="title">🌟 今日签文 🌟</div>
-    <div class="sign" id="sign">正在加载中...</div>
-    <button class="btn" id="refreshBtn">换一换</button>
-    <div class="info" id="info"></div>
-    <div class="footer">每人每日最多换签 5 次 ✨</div>
+  <div class="history-btn" onclick="toggleHistory()">签文历史</div>
+  <div class="card">
+    <h1>🌟 AfarStone · 今日签文 🌟</h1>
+    <div class="fortune" id="fortuneCn">加载中...</div>
+    <div class="fortune en" id="fortuneEn"></div>
+    <button onclick="drawFortune()">再抽一签</button>
   </div>
+  <div class="history" id="historyBox"></div>
+  <div class="footer">为你守护好运 · AfarStone</div>
 
   <script>
-    const signs = [
-      "今天你闪闪发光，幸运正向你靠近✨",
-      "愿你拥有温柔而坚定的力量🌸",
-      "所有好事都会不期而遇 🍀",
-      "放松心情，好运就在下一个转角💫",
-      "你已经比昨天更靠近幸福了🌈",
-      "别怕慢，幸福不会缺席 🍃",
-      "保持微笑，磁场正在为你聚光🔮",
-      "今天，是你发光的日子🌞",
-      "别忘了，你值得一切美好💖",
-      "好运气藏在温柔的心情里☁️"
+    const fortunes = [
+      ["今天你值得所有美好。", "You deserve all the good things today."],
+      ["相信自己，宇宙正在为你安排惊喜。", "Trust yourself, the universe is preparing a surprise for you."],
+      ["放轻松，一切都会顺利解决。", "Relax, everything will be resolved smoothly."],
+      ["爱是你内在最强大的力量。", "Love is the strongest force within you."],
+      ["慢一点没关系，前进就好。", "It's okay to go slow, as long as you keep going."],
+      ["你比你想象中更勇敢。", "You are braver than you think."],
+      ["当你微笑时，好运就在靠近你。", "When you smile, luck gets closer."],
+      ["保持温柔，坚定前行。", "Stay gentle, move forward with strength."],
+      ["世界因你而温柔。", "The world is gentler because of you."],
+      ["今天会是充满可能性的一天。", "Today is a day full of possibilities."]
     ];
 
-    const signEl = document.getElementById("sign");
-    const infoEl = document.getElementById("info");
-    const refreshBtn = document.getElementById("refreshBtn");
-
-    const today = new Date().toISOString().slice(0, 10);
-    let drawCount = parseInt(localStorage.getItem("draw_count") || 0);
-    let lastDrawDate = localStorage.getItem("last_draw_date");
-    let lastDrawSign = localStorage.getItem("last_draw_sign");
-
-    if (lastDrawDate !== today) {
-      drawCount = 0;
-      localStorage.setItem("draw_count", drawCount);
-      localStorage.removeItem("last_draw_sign");
-      lastDrawDate = today;
-      localStorage.setItem("last_draw_date", today);
+    function drawFortune() {
+      const index = Math.floor(Math.random() * fortunes.length);
+      const today = new Date().toISOString().split('T')[0];
+      const [cn, en] = fortunes[index];
+      document.getElementById('fortuneCn').textContent = cn;
+      document.getElementById('fortuneEn').textContent = en;
+      localStorage.setItem('lastFortune', JSON.stringify({ date: today, cn, en }));
+      saveHistory(today, cn);
+      updateHistory();
     }
 
-    function showAnimatedSign(text) {
-      signEl.classList.remove("show");
-      setTimeout(() => {
-        signEl.textContent = text;
-        signEl.classList.add("show");
-      }, 100);
+    function saveHistory(date, cn) {
+      const history = JSON.parse(localStorage.getItem('fortuneHistory') || '[]');
+      history.unshift({ date, cn });
+      localStorage.setItem('fortuneHistory', JSON.stringify(history.slice(0, 20)));
     }
 
-    function drawSign(forceNew = false) {
-      if (!forceNew && lastDrawSign) {
-        showAnimatedSign(lastDrawSign);
-        infoEl.textContent = `你今天已经抽过签啦（还可更换 ${5 - drawCount} 次）`;
-        return;
+    function updateHistory() {
+      const box = document.getElementById('historyBox');
+      const history = JSON.parse(localStorage.getItem('fortuneHistory') || '[]');
+      box.innerHTML = '<strong>历史签文：</strong><br>' + history.map(item => `<div>${item.date}：${item.cn}</div>`).join('');
+    }
+
+    function toggleHistory() {
+      const box = document.getElementById('historyBox');
+      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    window.onload = () => {
+      const last = JSON.parse(localStorage.getItem('lastFortune') || '{}');
+      if (last.date === new Date().toISOString().split('T')[0]) {
+        document.getElementById('fortuneCn').textContent = last.cn;
+        document.getElementById('fortuneEn').textContent = last.en;
+      } else {
+        drawFortune();
       }
-
-      const randomSign = signs[Math.floor(Math.random() * signs.length)];
-      showAnimatedSign(randomSign);
-      lastDrawSign = randomSign;
-      localStorage.setItem("last_draw_sign", randomSign);
-      infoEl.textContent = `签文生成于今天，请好好珍藏 💌（还可更换 ${5 - drawCount} 次）`;
-    }
-
-    refreshBtn.addEventListener('click', () => {
-      if (drawCount >= 5) {
-        infoEl.textContent = "今日已达最大换签次数，请明天再来🌙";
-        return;
-      }
-      drawCount++;
-      localStorage.setItem("draw_count", drawCount);
-      localStorage.removeItem("last_draw_sign");
-      drawSign(true);
-    });
-
-    drawSign();
+      updateHistory();
+    };
   </script>
 </body>
 </html>
