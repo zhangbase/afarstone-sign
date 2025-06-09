@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AfarStone · 每日幸运签</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #fef6f9, #dbe9ff);
+      font-family: 'Arial Rounded MT Bold', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      color: #333;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      max-width: 90%;
+    }
+    .brand {
+      font-size: 18px;
+      color: #a88cd5;
+      margin-bottom: 5px;
+    }
+    .title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .sign {
+      font-size: 20px;
+      margin: 20px 0;
+      color: #5e4b8b;
+    }
+    .info {
+      font-size: 14px;
+      color: #888;
+    }
+    .footer {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">AfarStone · 每日幸运签</div>
+    <div class="title">✨ 今日幸运签 ✨</div>
+    <div class="sign" id="sign">正在加载中...</div>
+    <div class="info" id="info"></div>
+    <div class="footer">明日再来签运哦～💖</div>
+  </div>
+
+  <script>
+    const signs = [
+      "今天你闪闪发光，幸运正向你靠近✨",
+      "愿你拥有温柔而坚定的力量🌸",
+      "所有好事都会不期而遇 🍀",
+      "放松心情，好运就在下一个转角💫",
+      "你已经比昨天更靠近幸福了🌈",
+      "别怕慢，幸福不会缺席 🍃",
+      "保持微笑，磁场正在为你聚光🔮",
+      "今天，是你发光的日子🌞",
+      "别忘了，你值得一切美好💖",
+      "好运气藏在温柔的心情里☁️"
+    ];
+
+    const signEl = document.getElementById("sign");
+    const infoEl = document.getElementById("info");
+    const today = new Date().toISOString().slice(0, 10);
+    const lastDrawDate = localStorage.getItem("last_draw_date");
+    const lastDrawSign = localStorage.getItem("last_draw_sign");
+
+    if (lastDrawDate === today && lastDrawSign) {
+      signEl.textContent = lastDrawSign;
+      infoEl.textContent = "你今天已经抽过签啦，明天再来哦～ 🌙";
+    } else {
+      const randomSign = signs[Math.floor(Math.random() * signs.length)];
+      signEl.textContent = randomSign;
+      infoEl.textContent = "签文生成于今天，请好好珍藏 💌";
+      localStorage.setItem("last_draw_date", today);
+      localStorage.setItem("last_draw_sign", randomSign);
+    }
+  </script>
+</body>
+</html>
