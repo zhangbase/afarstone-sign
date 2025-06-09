@@ -2,153 +2,105 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AfarStone · Daily Fortune</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AfarStone · 每日疗愈卡片</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC&family=Lora&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom right, #f9f7ff, #e3f0ff);
       font-family: 'Noto Serif SC', serif;
+      background: linear-gradient(to bottom right, #fdf6ff, #e7f2ff);
+      color: #333;
+      overflow-x: hidden;
+    }
+    .container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      color: #444;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      height: 100vh;
     }
     .card {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+    .card-inner {
       background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(10px);
       border-radius: 20px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.1);
       padding: 30px;
       text-align: center;
-      max-width: 90%;
-      width: 400px;
-      transition: all 0.5s ease;
+      width: 90%;
+      max-width: 400px;
     }
-    h1 {
-      font-size: 24px;
+    h2 {
+      margin-bottom: 15px;
       color: #8c6ac4;
-      margin-bottom: 10px;
     }
-    .fortune {
-      font-size: 20px;
-      margin: 20px 0 10px;
-      min-height: 60px;
-    }
-    .fortune.en {
+    .en {
       font-family: 'Lora', serif;
-      font-size: 16px;
+      font-size: 14px;
       color: #666;
+      margin-top: 10px;
     }
-    button {
-      margin-top: 15px;
+    .audio-btn {
       background: #8c6ac4;
       color: white;
       border: none;
       padding: 12px 24px;
-      border-radius: 25px;
+      border-radius: 30px;
       font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(140, 106, 196, 0.3);
-    }
-    button:hover {
-      background: #7a58b4;
-    }
-    .history-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 14px;
-      color: #8c6ac4;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .history {
-      display: none;
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 400px;
-      margin-top: 20px;
-      font-size: 14px;
-      text-align: left;
+      margin-top: 15px;
     }
     .footer {
-      margin-top: 30px;
       font-size: 12px;
       color: #aaa;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
     }
   </style>
 </head>
 <body>
-  <div class="history-btn" onclick="toggleHistory()">签文历史</div>
-  <div class="card">
-    <h1>🌟 AfarStone · 今日签文 🌟</h1>
-    <div class="fortune" id="fortuneCn">加载中...</div>
-    <div class="fortune en" id="fortuneEn"></div>
-    <button onclick="drawFortune()">再抽一签</button>
+  <div class="container">
+    <!-- 签文卡 -->
+    <section class="card">
+      <div class="card-inner">
+        <h2>🌟 今日签文</h2>
+        <div id="fortuneCn">你值得所有温柔与好运。</div>
+        <div class="en" id="fortuneEn">You deserve all the gentleness and good luck.</div>
+      </div>
+    </section>
+
+    <!-- 疗愈建议卡 -->
+    <section class="card">
+      <div class="card-inner">
+        <h2>🌷 疗愈建议</h2>
+        <div id="adviceCn">今天请写下你最感谢的三件事。</div>
+        <div class="en" id="adviceEn">Write down three things you’re grateful for today.</div>
+      </div>
+    </section>
+
+    <!-- 声音疗愈卡 -->
+    <section class="card">
+      <div class="card-inner">
+        <h2>🔊 声音疗愈</h2>
+        <div>闭上眼，感受风的呢喃。</div>
+        <button class="audio-btn" onclick="document.getElementById('audio').play()">播放声音</button>
+        <audio id="audio" src="https://cdn.pixabay.com/download/audio/2023/03/05/audio_c1dcd7cf51.mp3?filename=forest-nature-sound-short-14148.mp3"></audio>
+      </div>
+    </section>
   </div>
-  <div class="history" id="historyBox"></div>
-  <div class="footer">为你守护好运 · AfarStone</div>
-
-  <script>
-    const fortunes = [
-      ["今天你值得所有美好。", "You deserve all the good things today."],
-      ["相信自己，宇宙正在为你安排惊喜。", "Trust yourself, the universe is preparing a surprise for you."],
-      ["放轻松，一切都会顺利解决。", "Relax, everything will be resolved smoothly."],
-      ["爱是你内在最强大的力量。", "Love is the strongest force within you."],
-      ["慢一点没关系，前进就好。", "It's okay to go slow, as long as you keep going."],
-      ["你比你想象中更勇敢。", "You are braver than you think."],
-      ["当你微笑时，好运就在靠近你。", "When you smile, luck gets closer."],
-      ["保持温柔，坚定前行。", "Stay gentle, move forward with strength."],
-      ["世界因你而温柔。", "The world is gentler because of you."],
-      ["今天会是充满可能性的一天。", "Today is a day full of possibilities."]
-    ];
-
-    function drawFortune() {
-      const index = Math.floor(Math.random() * fortunes.length);
-      const today = new Date().toISOString().split('T')[0];
-      const [cn, en] = fortunes[index];
-      document.getElementById('fortuneCn').textContent = cn;
-      document.getElementById('fortuneEn').textContent = en;
-      localStorage.setItem('lastFortune', JSON.stringify({ date: today, cn, en }));
-      saveHistory(today, cn);
-      updateHistory();
-    }
-
-    function saveHistory(date, cn) {
-      const history = JSON.parse(localStorage.getItem('fortuneHistory') || '[]');
-      history.unshift({ date, cn });
-      localStorage.setItem('fortuneHistory', JSON.stringify(history.slice(0, 20)));
-    }
-
-    function updateHistory() {
-      const box = document.getElementById('historyBox');
-      const history = JSON.parse(localStorage.getItem('fortuneHistory') || '[]');
-      box.innerHTML = '<strong>历史签文：</strong><br>' + history.map(item => `<div>${item.date}：${item.cn}</div>`).join('');
-    }
-
-    function toggleHistory() {
-      const box = document.getElementById('historyBox');
-      box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    }
-
-    window.onload = () => {
-      const last = JSON.parse(localStorage.getItem('lastFortune') || '{}');
-      if (last.date === new Date().toISOString().split('T')[0]) {
-        document.getElementById('fortuneCn').textContent = last.cn;
-        document.getElementById('fortuneEn').textContent = last.en;
-      } else {
-        drawFortune();
-      }
-      updateHistory();
-    };
-  </script>
+  <div class="footer">AfarStone · 每日疗愈</div>
 </body>
 </html>
