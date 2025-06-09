@@ -9,7 +9,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(to bottom right, #fef6f9, #dbe9ff);
+      background: linear-gradient(to bottom right, #f7f3ff, #e0ecff);
       font-family: 'Arial Rounded MT Bold', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
       color: #333;
       text-align: center;
@@ -17,32 +17,35 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 20px;
     }
     .container {
-      background: white;
+      background: #ffffffee;
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      max-width: 90%;
-      position: relative;
+      border-radius: 24px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
     }
     .brand {
-      font-size: 18px;
+      font-size: 20px;
       color: #a88cd5;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
     .title {
-      font-size: 24px;
+      font-size: 26px;
       margin-bottom: 20px;
+      color: #444;
     }
     .sign {
-      font-size: 20px;
-      margin: 20px 0;
+      font-size: 22px;
+      margin: 30px 0;
       color: #5e4b8b;
       opacity: 0;
-      transform: scale(0.9);
+      transform: scale(0.95);
       transition: all 0.4s ease;
+      min-height: 80px;
     }
     .sign.show {
       opacity: 1;
@@ -51,21 +54,23 @@
     .info {
       font-size: 14px;
       color: #888;
+      margin-top: 10px;
     }
     .footer {
       font-size: 12px;
       color: #aaa;
-      margin-top: 15px;
+      margin-top: 20px;
     }
     .btn {
       background-color: #a88cd5;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 20px;
+      padding: 12px 24px;
+      border-radius: 30px;
       cursor: pointer;
-      margin-top: 20px;
       font-size: 16px;
+      box-shadow: 0 4px 12px rgba(168, 140, 213, 0.3);
+      transition: background-color 0.3s ease;
     }
     .btn:hover {
       background-color: #8b70c9;
@@ -75,11 +80,11 @@
 <body>
   <div class="container">
     <div class="brand">AfarStone · 每日幸运签</div>
-    <div class="title">✨ 今日幸运签 ✨</div>
+    <div class="title">🌟 今日签文 🌟</div>
     <div class="sign" id="sign">正在加载中...</div>
+    <button class="btn" id="refreshBtn">换一换</button>
     <div class="info" id="info"></div>
-    <button class="btn" id="refreshBtn">再抽一签</button>
-    <div class="footer">明日再来签运哦～💖</div>
+    <div class="footer">每人每日最多换签 5 次 ✨</div>
   </div>
 
   <script>
@@ -100,6 +105,19 @@
     const infoEl = document.getElementById("info");
     const refreshBtn = document.getElementById("refreshBtn");
 
+    const today = new Date().toISOString().slice(0, 10);
+    let drawCount = parseInt(localStorage.getItem("draw_count") || 0);
+    let lastDrawDate = localStorage.getItem("last_draw_date");
+    let lastDrawSign = localStorage.getItem("last_draw_sign");
+
+    if (lastDrawDate !== today) {
+      drawCount = 0;
+      localStorage.setItem("draw_count", drawCount);
+      localStorage.removeItem("last_draw_sign");
+      lastDrawDate = today;
+      localStorage.setItem("last_draw_date", today);
+    }
+
     function showAnimatedSign(text) {
       signEl.classList.remove("show");
       setTimeout(() => {
@@ -109,26 +127,26 @@
     }
 
     function drawSign(forceNew = false) {
-      const today = new Date().toISOString().slice(0, 10);
-      const lastDrawDate = localStorage.getItem("last_draw_date");
-      const lastDrawSign = localStorage.getItem("last_draw_sign");
-
-      if (!forceNew && lastDrawDate === today && lastDrawSign) {
+      if (!forceNew && lastDrawSign) {
         showAnimatedSign(lastDrawSign);
-        infoEl.textContent = "你今天已经抽过签啦，明天再来哦～ 🌙";
-        refreshBtn.style.display = 'block';
-      } else {
-        const randomSign = signs[Math.floor(Math.random() * signs.length)];
-        showAnimatedSign(randomSign);
-        infoEl.textContent = "签文生成于今天，请好好珍藏 💌";
-        localStorage.setItem("last_draw_date", today);
-        localStorage.setItem("last_draw_sign", randomSign);
-        refreshBtn.style.display = 'none';
+        infoEl.textContent = `你今天已经抽过签啦（还可更换 ${5 - drawCount} 次）`;
+        return;
       }
+
+      const randomSign = signs[Math.floor(Math.random() * signs.length)];
+      showAnimatedSign(randomSign);
+      lastDrawSign = randomSign;
+      localStorage.setItem("last_draw_sign", randomSign);
+      infoEl.textContent = `签文生成于今天，请好好珍藏 💌（还可更换 ${5 - drawCount} 次）`;
     }
 
     refreshBtn.addEventListener('click', () => {
-      localStorage.removeItem("last_draw_date");
+      if (drawCount >= 5) {
+        infoEl.textContent = "今日已达最大换签次数，请明天再来🌙";
+        return;
+      }
+      drawCount++;
+      localStorage.setItem("draw_count", drawCount);
       localStorage.removeItem("last_draw_sign");
       drawSign(true);
     });
